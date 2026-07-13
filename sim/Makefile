@@ -36,7 +36,7 @@ else
 endif
 
 #==============================
-.PHONY: all build run wave cov_gui cov_merge clean help
+.PHONY: all build run regress wave cov_gui cov_merge clean help
 
 all: build run
 
@@ -50,6 +50,8 @@ run:
 	mv $(TESTNAME)_$(SEED_RAND).log log
 	cp -rf  vsim.wlf log/$(TESTNAME)_$(SEED_RAND).wlf
 	ln -sf log/$(TESTNAME)_$(SEED_RAND).log run.log
+regress:
+	perl regress.pl
 wave:
 	$(VSIM) -i -view vsim.wlf -do "add wave vsim:/$(TB_NAME)/*; radix -$(RADIX)" &
 cov_gui:

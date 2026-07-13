@@ -6,6 +6,9 @@ sim/work/
 sim/vsim.dbg
 sim/vsim.wlf
 sim/transcript
+sim/regress.rpt
+sim/*.ucdb
+tmp/
 
 # OS generated files
 .DS_Store

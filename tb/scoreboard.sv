@@ -249,6 +249,10 @@ class scoreboard;
         end
     endtask
 
+    function bit passed();
+        return (mismatch_count + irq_mismatch_count + protocol_error_count) == 0;
+    endfunction
+
     function void report();
         int unsigned total_fail;
         total_fail = mismatch_count + irq_mismatch_count + protocol_error_count;

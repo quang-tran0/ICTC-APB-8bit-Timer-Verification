@@ -51,6 +51,8 @@ class base_test;
         #100us;
         $display("%0t: [base_test] End Simulation", $time);
         report();
+        $display("%s", env.sb.passed() ? "TEST PASSED" : "TEST FAILED");
+        $display("scenario finished -> $finish");
         $finish;
     endtask
 

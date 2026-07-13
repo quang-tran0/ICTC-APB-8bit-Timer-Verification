@@ -11,25 +11,20 @@ module timer_counter(
 );
 
 	logic [7:0] counter;
-	logic       load_armed;
 
 	always_ff @(posedge clk_in or negedge presetn) begin
 		if (!presetn) begin
 			counter <= 8'h00;
-			load_armed <= 1'b0;
 			s_ovf <= 1'b0;
 			s_udf <= 1'b0;
 		end else begin
 			s_ovf <= 1'b0;
 			s_udf <= 1'b0;
 
-			if (!load) begin
-				load_armed <= 1'b0;
-			end
-
-			if (load && !load_armed) begin
+			// The specification requires load to take priority over counting:
+			// while load is asserted, hold the counter at the TDR value.
+			if (load) begin
 				counter <= reg_TDR;
-				load_armed <= 1'b1;
 			end else if (timer_en) begin
 				if (count_down) begin
 					if (counter == 8'h00) begin

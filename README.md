@@ -39,17 +39,12 @@ ICTC-APB-8bit-Timer-Verification/
 │   ├── monitor.sv          # Bus monitor
 │   ├── scoreboard.sv       # Reference model and checker
 │   └── environment.sv      # Testbench component integration
-├── testcase/               # Test cases
-│   ├── base_test.sv
-│   ├── default_value_register_test.sv
-│   ├── rw_register_test.sv
-│   ├── w1c_register_test.sv
-│   ├── reserved_region_test.sv
-│   ├── test_factory.sv
-│   └── test_pkg.sv
+├── testcase/               # 32 directed/random test cases + factory/package
 ├── sim/                    # Simulation scripts
 │   ├── Makefile
 │   ├── compile.f
+│   ├── regress.cfg
+│   ├── regress.pl
 │   ├── rtl.f
 │   └── tb.f
 ├── Vplan_8bit_timer.xlsx   # Verification Plan
@@ -165,12 +160,16 @@ The scoreboard maintains reference registers (`ref_tcr`, `ref_tsr`, `ref_tdr`, `
 
 ## 5. Test Cases
 
-| Test Case | File | Objective |
-|-----------|------|-----------|
-| `default_value_register_test` | `default_value_register_test.sv` | Verify all registers are 0 after reset |
-| `rw_register_test` | `rw_register_test.sv` | Verify read/write access to TCR, TDR, and TIE using walking-1, walking-0, and random patterns |
-| `w1c_register_test` | `w1c_register_test.sv` | Verify TSR W1C behavior: writing 1 clears flags, writing 1 cannot set flags |
-| `reserved_region_test` | `reserved_region_test.sv` | Verify reserved address region (0x04-0xFF) reads as 0 and does not affect other registers |
+The regression contains all 31 test cases in `Vplan_8bit_timer.xlsx`, plus the
+additional `load_hold_test` that verifies the counter remains at TDR while
+`TCR.load` stays asserted.
+
+| Group | Count | Coverage |
+|-------|------:|----------|
+| Register / APB | 8 | Defaults, RW, reserved space, W1C, reset, protocol, CDC access, random access |
+| Clock divisor | 5 | No divide, /2, /4, /8, runtime reconfiguration |
+| Counter | 11 | Up/down, load, load hold, enable/disable, rollover, direction change, random stress |
+| Interrupt | 8 | Overflow/underflow, polling, W1C clear, late enable, dual source, race, divided clocks |
 
 ---
 
@@ -202,6 +201,9 @@ make run
 # Run a specific test
 make run TESTNAME=rw_register_test
 
+# Compile once and run the complete 32-test regression
+make regress
+
 # Open waveform viewer
 make wave
 
@@ -229,15 +231,9 @@ make help
 
 ## 7. Verification Status
 
-The implemented test cases have been run and passed according to the project commit history:
-
-```
-42ee7aa Update scoreboard and monitor
-34a8751 Passed reserved_region_test
-8a53c7b Passed rw_register_test
-2632027 Add default value register test
-b076b64 Add base_test
-```
+The complete regression was run with QuestaSim 10.2c after integrating the
+Vplan test suite: **32 passed, 0 failed, 0 unknown**. The generated summary is
+written to `sim/regress.rpt`; detailed logs and waveforms are under `sim/log/`.
 
 The scoreboard prints a final report similar to:
 

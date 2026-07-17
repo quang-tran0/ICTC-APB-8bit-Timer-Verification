@@ -16,12 +16,11 @@ RUNARG    ?=
 # QuestaSim is installed on Windows and invoked from WSL through /mnt/c.
 # Override on the command line if Questa is installed elsewhere, for example:
 #   make all QUESTA_PATH=/mnt/d/Siemens/Questa/win64
-QUESTA_PATH ?= /mnt/c/questasim64_10.2c/win64
-VLIB        ?= $(QUESTA_PATH)/vlib.exe
-VMAP        ?= $(QUESTA_PATH)/vmap.exe
-VLOG        ?= $(QUESTA_PATH)/vlog.exe
-VSIM        ?= $(QUESTA_PATH)/vsim.exe
-VCOVER      ?= $(QUESTA_PATH)/vcover.exe
+VLIB        ?= vlib
+VMAP        ?= vmap
+VLOG        ?= vlog
+VSIM        ?= vsim
+VCOVER      ?= vcover
 #==============================
 ifeq ($(COV),ON)
   CMP_COV_OPT   = -coveropt 3 +cover=bcestf 

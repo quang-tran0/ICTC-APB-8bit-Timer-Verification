@@ -10,11 +10,14 @@ interface dut_if;
     logic [7:0]    prdata;     // APB Read data
     logic          pready;     // APB Read data
     logic          interrupt;  // Interrupt signal
+    logic          clk_in;     // Internal divided clock (verification tap)
+    logic [7:0]    counter;    // Internal counter value (verification tap)
+    logic          allow_invalid_apb;
 
     wire access = psel && penable;
 
     property p_penable_needs_psel;
-        @(posedge pclk) disable iff (!presetn)
+        @(posedge pclk) disable iff (!presetn || allow_invalid_apb)
             penable |-> psel;
     endproperty
     a_penable_needs_psel: assert property (p_penable_needs_psel)
@@ -49,7 +52,7 @@ interface dut_if;
         else $error("%0t: [assert] pwdata changed during write transfer", $time);
 
     property p_access_ends;
-        @(posedge pclk) disable iff (!presetn)
+        @(posedge pclk) disable iff (!presetn || allow_invalid_apb)
             (access && pready) |=> !penable;
     endproperty
     a_access_ends: assert property (p_access_ends)

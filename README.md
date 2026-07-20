@@ -39,7 +39,7 @@ ICTC-APB-8bit-Timer-Verification/
 │   ├── monitor.sv          # Bus monitor
 │   ├── scoreboard.sv       # Reference model and checker
 │   └── environment.sv      # Testbench component integration
-├── testcase/               # 32 directed/random test cases + factory/package
+├── testcase/               # 56 directed/random test cases + factory/package
 ├── sim/                    # Simulation scripts
 │   ├── Makefile
 │   ├── compile.f
@@ -98,7 +98,7 @@ ICTC-APB-8bit-Timer-Verification/
 
 ### 3.3. RTL Module Descriptions
 
-- **`timer_register.v`**: Handles APB transactions and stores the TCR, TDR, and TIE registers. Updates the TSR flags from the counter and supports W1C access to TSR.
+- **`timer_register.v`**: Handles APB transactions and stores the TCR, TDR, and TIE registers. It synchronizes overflow/underflow event toggles into `pclk`, supports W1C access to TSR, and drives PRDATA only during READ ACCESS.
 - **`timer_clock_divisor.v`**: Divides `ker_clk` based on `clkdiv`:
   - `00`: bypass `ker_clk`
   - `01`: divide by 2
@@ -155,21 +155,25 @@ The scoreboard maintains reference registers (`ref_tcr`, `ref_tsr`, `ref_tdr`, `
 - Updates the reference model on every **WRITE** transaction.
 - Predicts the expected read value on every **READ** transaction.
 - Reports total comparisons, mismatches, and a final **PASS/FAIL** status.
+- Samples functional coverage from real APB, configuration, counter, and
+  interrupt activity.
 
 ---
 
 ## 5. Test Cases
 
-The regression contains all 31 test cases in `Vplan_8bit_timer.xlsx`, plus the
-additional `load_hold_test` that verifies the counter remains at TDR while
-`TCR.load` stays asserted.
+The regression contains all 56 test cases in `Vplan_8bit_timer.xlsx`, including
+the full 4-divider x 4-start/direction matrix, nine APB phase tests,
+`load_hold_test`, all four W1C interrupt-clear modes, and the complete
+TIE-mask x status-source cross.
 
 | Group | Count | Coverage |
 |-------|------:|----------|
-| Register / APB | 8 | Defaults, RW, reserved space, W1C, reset, protocol, CDC access, random access |
-| Clock divisor | 5 | No divide, /2, /4, /8, runtime reconfiguration |
+| Register | 7 | Defaults, RW, reserved space, W1C, reset, CDC access, random access |
+| Clock divisor | 17 | Four modes x up/down x fixed/random start, plus runtime reconfiguration |
 | Counter | 11 | Up/down, load, load hold, enable/disable, rollover, direction change, random stress |
-| Interrupt | 8 | Overflow/underflow, polling, W1C clear, late enable, dual source, race, divided clocks |
+| Interrupt | 12 | Overflow/underflow, polling, W1C clear at all four divisors, late enable, dual source, mask/source cross, race, divided clocks |
+| APB | 9 | IDLE/SETUP/ACCESS, PSEL/PENABLE negative cases, valid access, and PRDATA phase gating |
 
 ---
 
@@ -201,7 +205,7 @@ make run
 # Run a specific test
 make run TESTNAME=rw_register_test
 
-# Compile once and run the complete 32-test regression
+# Run 56 tests, merge coverage, and generate regress.rpt plus coverage.rpt
 make regress
 
 # Open waveform viewer
@@ -209,6 +213,9 @@ make wave
 
 # Open coverage GUI (requires COV=ON)
 make cov_gui
+
+# Re-merge existing per-test UCDB files and regenerate coverage.rpt
+make cov_merge
 
 # Clean generated files
 make clean
@@ -231,19 +238,25 @@ make help
 
 ## 7. Verification Status
 
-The complete regression was run with QuestaSim 10.2c after integrating the
-Vplan test suite: **32 passed, 0 failed, 0 unknown**. The generated summary is
-written to `sim/regress.rpt`; detailed logs and waveforms are under `sim/log/`.
+The complete regression was run with QuestaSim after integrating the updated
+Vplan test suite: **56 passed, 0 failed, 0 unknown**. All four functional
+covergroups and all **61/61 functional coverage bins** reached **100%** in the
+merged database. Results are written to `sim/regress.rpt` and
+`sim/coverage.rpt`; detailed logs and waveforms are under `sim/log/`.
 
 The scoreboard prints a final report similar to:
 
 ```
 ========== [scoreboard] FINAL REPORT ===========
-  compares   = <n>
-  writes     = <n>
-  reads      = <n>
-  mismatches = 0
-  STATUS     = PASS
+  compares         = <n>
+  writes           = <n>
+  reads            = <n>
+  mismatches       = 0
+  cg_reg_access    = <per-test %>
+  cg_config        = <per-test %>
+  cg_counter       = <per-test %>
+  cg_interrupt     = <per-test %>
+  STATUS           = PASS
 ================================================
 ```
 

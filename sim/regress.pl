@@ -69,6 +69,7 @@ sub main {
     print "Run regression...\n";
     parse_cfg();
     run_regress();
+    merge_coverage() if lc($cov) eq 'on';
     classify_results();
     report();
 }
@@ -148,7 +149,14 @@ sub parse_cfg {
 # ----------------------------------------------------------------------------
 sub run_regress {
     $start_time = time();
-    system("make build");
+    my $cov_arg = lc($cov) eq 'on' ? ' COV=ON' : '';
+
+    if ($cov_arg ne '') {
+        unlink glob('*.ucdb');
+        unlink 'coverage.rpt';
+    }
+
+    system("make build$cov_arg");
     print "\n";
 
     for my $tc (@tc_list) {
@@ -157,11 +165,17 @@ sub run_regress {
         my $opts = $tc->{opts};
 
         print "==== Running $name (seed=$seed) ====\n";
-        my $cmd = "make run TESTNAME=$name SEED=$seed RUNARG=$opts 2>&1";
+        my $cmd = "make run TESTNAME=$name SEED=$seed RUNARG=$opts$cov_arg 2>&1";
         system($cmd);
         print "\n";
     }
     $end_time = time();
+}
+
+sub merge_coverage {
+    print "==== Merging coverage databases ====\n";
+    system("make cov_merge");
+    print "\n";
 }
 
 # ----------------------------------------------------------------------------

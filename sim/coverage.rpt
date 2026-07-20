@@ -1,0 +1,602 @@
+Coverage Report by instance with details
+
+=================================================================================
+=== Instance: /timer_pkg
+=== Design Unit: work.timer_pkg
+=================================================================================
+
+Covergroup Coverage:
+    Covergroups                      4        na        na   100.00%
+        Coverpoints/Crosses         15        na        na        na
+            Covergroup Bins         61        61         0   100.00%
+----------------------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal       Bins    Status               
+                                                                                                         
+----------------------------------------------------------------------------------------------------------
+ TYPE /timer_pkg/scoreboard/cg_reg_access             100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_addr                                100.00%        100          -    Covered              
+        covered/total bins:                                 5          5          -                      
+        missing/total bins:                                 0          5          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin tcr                                           309          1          -    Covered              
+        bin tsr                                           198          1          -    Covered              
+        bin tdr                                           150          1          -    Covered              
+        bin tie                                            97          1          -    Covered              
+        bin reserved                                       93          1          -    Covered              
+    Coverpoint cp_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin reads                                         270          1          -    Covered              
+        bin writes                                        577          1          -    Covered              
+    Cross cx_addr_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 9          9          -                      
+        missing/total bins:                                 0          9          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <reserved,reads>                           49          1          -    Covered              
+            bin <tie,writes>                               62          1          -    Covered              
+            bin <tsr,writes>                               99          1          -    Covered              
+            bin <tcr,writes>                              260          1          -    Covered              
+            bin <tie,reads>                                35          1          -    Covered              
+            bin <tsr,reads>                                99          1          -    Covered              
+            bin <tcr,reads>                                49          1          -    Covered              
+            bin <tdr,writes>                              112          1          -    Covered              
+            bin <tdr,reads>                                38          1          -    Covered              
+        Illegal and Ignore Bins:
+            ignore_bin reserved_write                      44                     -    Occurred             
+ Covergroup instance \/timer_pkg::scoreboard::cg_reg_access  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_addr                                100.00%        100          -    Covered              
+        covered/total bins:                                 5          5          -                      
+        missing/total bins:                                 0          5          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin tcr                                           309          1          -    Covered              
+        bin tsr                                           198          1          -    Covered              
+        bin tdr                                           150          1          -    Covered              
+        bin tie                                            97          1          -    Covered              
+        bin reserved                                       93          1          -    Covered              
+    Coverpoint cp_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin reads                                         270          1          -    Covered              
+        bin writes                                        577          1          -    Covered              
+    Cross cx_addr_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 9          9          -                      
+        missing/total bins:                                 0          9          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <reserved,reads>                           49          1          -    Covered              
+            bin <tie,writes>                               62          1          -    Covered              
+            bin <tsr,writes>                               99          1          -    Covered              
+            bin <tcr,writes>                              260          1          -    Covered              
+            bin <tie,reads>                                35          1          -    Covered              
+            bin <tsr,reads>                                99          1          -    Covered              
+            bin <tcr,reads>                                49          1          -    Covered              
+            bin <tdr,writes>                              112          1          -    Covered              
+            bin <tdr,reads>                                38          1          -    Covered              
+        Illegal and Ignore Bins:
+            ignore_bin reserved_write                      44                     -    Occurred             
+ TYPE /timer_pkg/scoreboard/cg_config                 100.00%        100          -    Covered              
+    covered/total bins:                                    18         18          -                      
+    missing/total bins:                                     0         18          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_clk_div                             100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_divide                                     142          1          -    Covered              
+        bin div_2                                          38          1          -    Covered              
+        bin div_4                                          44          1          -    Covered              
+        bin div_8                                          36          1          -    Covered              
+    Coverpoint cp_count_down                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin up                                            150          1          -    Covered              
+        bin down                                          110          1          -    Covered              
+    Coverpoint cp_load                                100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin clear                                         172          1          -    Covered              
+        bin set                                            88          1          -    Covered              
+    Coverpoint cp_timer_en                            100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin start                                          82          1          -    Covered              
+        bin stop                                           81          1          -    Covered              
+    Cross cx_clkdiv_direction                         100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <no_divide,down>                           15          1          -    Covered              
+            bin <div_8,down>                                5          1          -    Covered              
+            bin <div_4,down>                                8          1          -    Covered              
+            bin <div_2,down>                                4          1          -    Covered              
+            bin <div_8,up>                                  6          1          -    Covered              
+            bin <div_4,up>                                  6          1          -    Covered              
+            bin <div_2,up>                                  7          1          -    Covered              
+            bin <no_divide,up>                             31          1          -    Covered              
+ Covergroup instance \/timer_pkg::scoreboard::cg_config  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    18         18          -                      
+    missing/total bins:                                     0         18          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_clk_div                             100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_divide                                     142          1          -    Covered              
+        bin div_2                                          38          1          -    Covered              
+        bin div_4                                          44          1          -    Covered              
+        bin div_8                                          36          1          -    Covered              
+    Coverpoint cp_count_down                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin up                                            150          1          -    Covered              
+        bin down                                          110          1          -    Covered              
+    Coverpoint cp_load                                100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin clear                                         172          1          -    Covered              
+        bin set                                            88          1          -    Covered              
+    Coverpoint cp_timer_en                            100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin start                                          82          1          -    Covered              
+        bin stop                                           81          1          -    Covered              
+    Cross cx_clkdiv_direction                         100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <no_divide,down>                           15          1          -    Covered              
+            bin <div_8,down>                                5          1          -    Covered              
+            bin <div_4,down>                                8          1          -    Covered              
+            bin <div_2,down>                                4          1          -    Covered              
+            bin <div_8,up>                                  6          1          -    Covered              
+            bin <div_4,up>                                  6          1          -    Covered              
+            bin <div_2,up>                                  7          1          -    Covered              
+            bin <no_divide,up>                             31          1          -    Covered              
+ TYPE /timer_pkg/scoreboard/cg_counter                100.00%        100          -    Covered              
+    covered/total bins:                                    11         11          -                      
+    missing/total bins:                                     0         11          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_cnt_value                           100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                       202293          1          -    Covered              
+        bin one                                          3952          1          -    Covered              
+        bin low                                        252068          1          -    Covered              
+        bin mid                                            15          1          -    Covered              
+        bin high                                       235259          1          -    Covered              
+        bin max                                          2150          1          -    Covered              
+    Coverpoint cp_cnt_transition                      100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       42          1          -    Covered              
+        bin underflow                                      33          1          -    Covered              
+    Coverpoint cp_tdr_load_value                      100.00%        100          -    Covered              
+        covered/total bins:                                 3          3          -                      
+        missing/total bins:                                 0          3          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                          312          1          -    Covered              
+        bin max                                            32          1          -    Covered              
+        bin others                                       3010          1          -    Covered              
+ Covergroup instance \/timer_pkg::scoreboard::cg_counter  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    11         11          -                      
+    missing/total bins:                                     0         11          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_cnt_value                           100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                       202293          1          -    Covered              
+        bin one                                          3952          1          -    Covered              
+        bin low                                        252068          1          -    Covered              
+        bin mid                                            15          1          -    Covered              
+        bin high                                       235259          1          -    Covered              
+        bin max                                          2150          1          -    Covered              
+    Coverpoint cp_cnt_transition                      100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       42          1          -    Covered              
+        bin underflow                                      33          1          -    Covered              
+    Coverpoint cp_tdr_load_value                      100.00%        100          -    Covered              
+        covered/total bins:                                 3          3          -                      
+        missing/total bins:                                 0          3          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                          312          1          -    Covered              
+        bin max                                            32          1          -    Covered              
+        bin others                                       3010          1          -    Covered              
+ TYPE /timer_pkg/scoreboard/cg_interrupt              100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_tie                                 100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin disabled                                       48          1          -    Covered              
+        bin ovf_only                                       29          1          -    Covered              
+        bin udf_only                                       25          1          -    Covered              
+        bin both                                            9          1          -    Covered              
+    Coverpoint cp_status_src                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       34          1          -    Covered              
+        bin underflow                                      28          1          -    Covered              
+    Coverpoint cp_int_out                             100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin asserted                                       28          1          -    Covered              
+        bin cleared                                        28          1          -    Covered              
+    Cross cx_tie_status                               100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <ovf_only,underflow>                        1          1          -    Covered              
+            bin <udf_only,overflow>                         1          1          -    Covered              
+            bin <udf_only,underflow>                        9          1          -    Covered              
+            bin <ovf_only,overflow>                        11          1          -    Covered              
+            bin <both,underflow>                            2          1          -    Covered              
+            bin <both,overflow>                             2          1          -    Covered              
+            bin <disabled,overflow>                        20          1          -    Covered              
+            bin <disabled,underflow>                       16          1          -    Covered              
+ Covergroup instance \/timer_pkg::scoreboard::cg_interrupt  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_tie                                 100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin disabled                                       48          1          -    Covered              
+        bin ovf_only                                       29          1          -    Covered              
+        bin udf_only                                       25          1          -    Covered              
+        bin both                                            9          1          -    Covered              
+    Coverpoint cp_status_src                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       34          1          -    Covered              
+        bin underflow                                      28          1          -    Covered              
+    Coverpoint cp_int_out                             100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin asserted                                       28          1          -    Covered              
+        bin cleared                                        28          1          -    Covered              
+    Cross cx_tie_status                               100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <ovf_only,underflow>                        1          1          -    Covered              
+            bin <udf_only,overflow>                         1          1          -    Covered              
+            bin <udf_only,underflow>                        9          1          -    Covered              
+            bin <ovf_only,overflow>                        11          1          -    Covered              
+            bin <both,underflow>                            2          1          -    Covered              
+            bin <both,overflow>                             2          1          -    Covered              
+            bin <disabled,overflow>                        20          1          -    Covered              
+            bin <disabled,underflow>                       16          1          -    Covered              
+
+COVERGROUP COVERAGE:
+----------------------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal       Bins    Status               
+                                                                                                         
+----------------------------------------------------------------------------------------------------------
+ TYPE /timer_pkg/scoreboard/cg_reg_access             100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_addr                                100.00%        100          -    Covered              
+        covered/total bins:                                 5          5          -                      
+        missing/total bins:                                 0          5          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin tcr                                           309          1          -    Covered              
+        bin tsr                                           198          1          -    Covered              
+        bin tdr                                           150          1          -    Covered              
+        bin tie                                            97          1          -    Covered              
+        bin reserved                                       93          1          -    Covered              
+    Coverpoint cp_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin reads                                         270          1          -    Covered              
+        bin writes                                        577          1          -    Covered              
+    Cross cx_addr_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 9          9          -                      
+        missing/total bins:                                 0          9          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <reserved,reads>                           49          1          -    Covered              
+            bin <tie,writes>                               62          1          -    Covered              
+            bin <tsr,writes>                               99          1          -    Covered              
+            bin <tcr,writes>                              260          1          -    Covered              
+            bin <tie,reads>                                35          1          -    Covered              
+            bin <tsr,reads>                                99          1          -    Covered              
+            bin <tcr,reads>                                49          1          -    Covered              
+            bin <tdr,writes>                              112          1          -    Covered              
+            bin <tdr,reads>                                38          1          -    Covered              
+        Illegal and Ignore Bins:
+            ignore_bin reserved_write                      44                     -    Occurred             
+ Covergroup instance \/timer_pkg::scoreboard::cg_reg_access  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_addr                                100.00%        100          -    Covered              
+        covered/total bins:                                 5          5          -                      
+        missing/total bins:                                 0          5          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin tcr                                           309          1          -    Covered              
+        bin tsr                                           198          1          -    Covered              
+        bin tdr                                           150          1          -    Covered              
+        bin tie                                            97          1          -    Covered              
+        bin reserved                                       93          1          -    Covered              
+    Coverpoint cp_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin reads                                         270          1          -    Covered              
+        bin writes                                        577          1          -    Covered              
+    Cross cx_addr_dir                                 100.00%        100          -    Covered              
+        covered/total bins:                                 9          9          -                      
+        missing/total bins:                                 0          9          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <reserved,reads>                           49          1          -    Covered              
+            bin <tie,writes>                               62          1          -    Covered              
+            bin <tsr,writes>                               99          1          -    Covered              
+            bin <tcr,writes>                              260          1          -    Covered              
+            bin <tie,reads>                                35          1          -    Covered              
+            bin <tsr,reads>                                99          1          -    Covered              
+            bin <tcr,reads>                                49          1          -    Covered              
+            bin <tdr,writes>                              112          1          -    Covered              
+            bin <tdr,reads>                                38          1          -    Covered              
+        Illegal and Ignore Bins:
+            ignore_bin reserved_write                      44                     -    Occurred             
+ TYPE /timer_pkg/scoreboard/cg_config                 100.00%        100          -    Covered              
+    covered/total bins:                                    18         18          -                      
+    missing/total bins:                                     0         18          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_clk_div                             100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_divide                                     142          1          -    Covered              
+        bin div_2                                          38          1          -    Covered              
+        bin div_4                                          44          1          -    Covered              
+        bin div_8                                          36          1          -    Covered              
+    Coverpoint cp_count_down                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin up                                            150          1          -    Covered              
+        bin down                                          110          1          -    Covered              
+    Coverpoint cp_load                                100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin clear                                         172          1          -    Covered              
+        bin set                                            88          1          -    Covered              
+    Coverpoint cp_timer_en                            100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin start                                          82          1          -    Covered              
+        bin stop                                           81          1          -    Covered              
+    Cross cx_clkdiv_direction                         100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <no_divide,down>                           15          1          -    Covered              
+            bin <div_8,down>                                5          1          -    Covered              
+            bin <div_4,down>                                8          1          -    Covered              
+            bin <div_2,down>                                4          1          -    Covered              
+            bin <div_8,up>                                  6          1          -    Covered              
+            bin <div_4,up>                                  6          1          -    Covered              
+            bin <div_2,up>                                  7          1          -    Covered              
+            bin <no_divide,up>                             31          1          -    Covered              
+ Covergroup instance \/timer_pkg::scoreboard::cg_config  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    18         18          -                      
+    missing/total bins:                                     0         18          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_clk_div                             100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin no_divide                                     142          1          -    Covered              
+        bin div_2                                          38          1          -    Covered              
+        bin div_4                                          44          1          -    Covered              
+        bin div_8                                          36          1          -    Covered              
+    Coverpoint cp_count_down                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin up                                            150          1          -    Covered              
+        bin down                                          110          1          -    Covered              
+    Coverpoint cp_load                                100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin clear                                         172          1          -    Covered              
+        bin set                                            88          1          -    Covered              
+    Coverpoint cp_timer_en                            100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin start                                          82          1          -    Covered              
+        bin stop                                           81          1          -    Covered              
+    Cross cx_clkdiv_direction                         100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <no_divide,down>                           15          1          -    Covered              
+            bin <div_8,down>                                5          1          -    Covered              
+            bin <div_4,down>                                8          1          -    Covered              
+            bin <div_2,down>                                4          1          -    Covered              
+            bin <div_8,up>                                  6          1          -    Covered              
+            bin <div_4,up>                                  6          1          -    Covered              
+            bin <div_2,up>                                  7          1          -    Covered              
+            bin <no_divide,up>                             31          1          -    Covered              
+ TYPE /timer_pkg/scoreboard/cg_counter                100.00%        100          -    Covered              
+    covered/total bins:                                    11         11          -                      
+    missing/total bins:                                     0         11          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_cnt_value                           100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                       202293          1          -    Covered              
+        bin one                                          3952          1          -    Covered              
+        bin low                                        252068          1          -    Covered              
+        bin mid                                            15          1          -    Covered              
+        bin high                                       235259          1          -    Covered              
+        bin max                                          2150          1          -    Covered              
+    Coverpoint cp_cnt_transition                      100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       42          1          -    Covered              
+        bin underflow                                      33          1          -    Covered              
+    Coverpoint cp_tdr_load_value                      100.00%        100          -    Covered              
+        covered/total bins:                                 3          3          -                      
+        missing/total bins:                                 0          3          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                          312          1          -    Covered              
+        bin max                                            32          1          -    Covered              
+        bin others                                       3010          1          -    Covered              
+ Covergroup instance \/timer_pkg::scoreboard::cg_counter  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    11         11          -                      
+    missing/total bins:                                     0         11          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_cnt_value                           100.00%        100          -    Covered              
+        covered/total bins:                                 6          6          -                      
+        missing/total bins:                                 0          6          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                       202293          1          -    Covered              
+        bin one                                          3952          1          -    Covered              
+        bin low                                        252068          1          -    Covered              
+        bin mid                                            15          1          -    Covered              
+        bin high                                       235259          1          -    Covered              
+        bin max                                          2150          1          -    Covered              
+    Coverpoint cp_cnt_transition                      100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       42          1          -    Covered              
+        bin underflow                                      33          1          -    Covered              
+    Coverpoint cp_tdr_load_value                      100.00%        100          -    Covered              
+        covered/total bins:                                 3          3          -                      
+        missing/total bins:                                 0          3          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin zero                                          312          1          -    Covered              
+        bin max                                            32          1          -    Covered              
+        bin others                                       3010          1          -    Covered              
+ TYPE /timer_pkg/scoreboard/cg_interrupt              100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_tie                                 100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin disabled                                       48          1          -    Covered              
+        bin ovf_only                                       29          1          -    Covered              
+        bin udf_only                                       25          1          -    Covered              
+        bin both                                            9          1          -    Covered              
+    Coverpoint cp_status_src                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       34          1          -    Covered              
+        bin underflow                                      28          1          -    Covered              
+    Coverpoint cp_int_out                             100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin asserted                                       28          1          -    Covered              
+        bin cleared                                        28          1          -    Covered              
+    Cross cx_tie_status                               100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <ovf_only,underflow>                        1          1          -    Covered              
+            bin <udf_only,overflow>                         1          1          -    Covered              
+            bin <udf_only,underflow>                        9          1          -    Covered              
+            bin <ovf_only,overflow>                        11          1          -    Covered              
+            bin <both,underflow>                            2          1          -    Covered              
+            bin <both,overflow>                             2          1          -    Covered              
+            bin <disabled,overflow>                        20          1          -    Covered              
+            bin <disabled,underflow>                       16          1          -    Covered              
+ Covergroup instance \/timer_pkg::scoreboard::cg_interrupt  
+                                                      100.00%        100          -    Covered              
+    covered/total bins:                                    16         16          -                      
+    missing/total bins:                                     0         16          -                      
+    % Hit:                                            100.00%        100          -                      
+    Coverpoint cp_tie                                 100.00%        100          -    Covered              
+        covered/total bins:                                 4          4          -                      
+        missing/total bins:                                 0          4          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin disabled                                       48          1          -    Covered              
+        bin ovf_only                                       29          1          -    Covered              
+        bin udf_only                                       25          1          -    Covered              
+        bin both                                            9          1          -    Covered              
+    Coverpoint cp_status_src                          100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin overflow                                       34          1          -    Covered              
+        bin underflow                                      28          1          -    Covered              
+    Coverpoint cp_int_out                             100.00%        100          -    Covered              
+        covered/total bins:                                 2          2          -                      
+        missing/total bins:                                 0          2          -                      
+        % Hit:                                        100.00%        100          -                      
+        bin asserted                                       28          1          -    Covered              
+        bin cleared                                        28          1          -    Covered              
+    Cross cx_tie_status                               100.00%        100          -    Covered              
+        covered/total bins:                                 8          8          -                      
+        missing/total bins:                                 0          8          -                      
+        % Hit:                                        100.00%        100          -                      
+        Auto, Default and User Defined Bins:
+            bin <ovf_only,underflow>                        1          1          -    Covered              
+            bin <udf_only,overflow>                         1          1          -    Covered              
+            bin <udf_only,underflow>                        9          1          -    Covered              
+            bin <ovf_only,overflow>                        11          1          -    Covered              
+            bin <both,underflow>                            2          1          -    Covered              
+            bin <both,overflow>                             2          1          -    Covered              
+            bin <disabled,overflow>                        20          1          -    Covered              
+            bin <disabled,underflow>                       16          1          -    Covered              
+
+TOTAL COVERGROUP COVERAGE: 100.00%  COVERGROUP TYPES: 4
+
+Total Coverage By Instance (filtered view): 100.00%
+

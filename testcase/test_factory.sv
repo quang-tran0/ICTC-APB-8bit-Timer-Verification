@@ -9,15 +9,35 @@ class test_factory;
             "reserved_region_test":           test = reserved_region_test::new();
             "w1c_register_test":              test = w1c_register_test::new();
             "reset_on_the_fly_test":          test = reset_on_the_fly_test::new();
-            "apb_protocol_test":              test = apb_protocol_test::new();
+            "apb_write_idle_no_select_test": test = apb_write_idle_no_select_test::new();
+            "apb_write_penable_without_psel_test": test = apb_write_penable_without_psel_test::new();
+            "apb_write_setup_no_access_test": test = apb_write_setup_no_access_test::new();
+            "apb_write_access_test":         test = apb_write_access_test::new();
+            "apb_read_idle_no_select_test":  test = apb_read_idle_no_select_test::new();
+            "apb_read_penable_without_psel_test": test = apb_read_penable_without_psel_test::new();
+            "apb_read_setup_prdata_early_test": test = apb_read_setup_prdata_early_test::new();
+            "apb_read_access_test":          test = apb_read_access_test::new();
+            "apb_write_access_prdata_active_test": test = apb_write_access_prdata_active_test::new();
             "cdc_access_while_counting_test": test = cdc_access_while_counting_test::new();
             "random_register_test":           test = random_register_test::new();
 
             // Clock divisor test
-            "clkdiv_no_divide_test":          test = clkdiv_no_divide_test::new();
-            "clkdiv_by2_test":                test = clkdiv_by2_test::new();
-            "clkdiv_by4_test":                test = clkdiv_by4_test::new();
-            "clkdiv_by8_test":                test = clkdiv_by8_test::new();
+            "clkdiv_no_divide_up_from0_test": test = clkdiv_no_divide_up_from0_test::new();
+            "clkdiv_no_divide_down_from255_test": test = clkdiv_no_divide_down_from255_test::new();
+            "clkdiv_no_divide_up_random_load_test": test = clkdiv_no_divide_up_random_load_test::new();
+            "clkdiv_no_divide_down_random_load_test": test = clkdiv_no_divide_down_random_load_test::new();
+            "clkdiv_by2_up_from0_test":        test = clkdiv_by2_up_from0_test::new();
+            "clkdiv_by2_down_from255_test":   test = clkdiv_by2_down_from255_test::new();
+            "clkdiv_by2_up_random_load_test": test = clkdiv_by2_up_random_load_test::new();
+            "clkdiv_by2_down_random_load_test": test = clkdiv_by2_down_random_load_test::new();
+            "clkdiv_by4_up_from0_test":        test = clkdiv_by4_up_from0_test::new();
+            "clkdiv_by4_down_from255_test":   test = clkdiv_by4_down_from255_test::new();
+            "clkdiv_by4_up_random_load_test": test = clkdiv_by4_up_random_load_test::new();
+            "clkdiv_by4_down_random_load_test": test = clkdiv_by4_down_random_load_test::new();
+            "clkdiv_by8_up_from0_test":        test = clkdiv_by8_up_from0_test::new();
+            "clkdiv_by8_down_from255_test":   test = clkdiv_by8_down_from255_test::new();
+            "clkdiv_by8_up_random_load_test": test = clkdiv_by8_up_random_load_test::new();
+            "clkdiv_by8_down_random_load_test": test = clkdiv_by8_down_random_load_test::new();
             "clkdiv_reconfig_test":           test = clkdiv_reconfig_test::new();
 
             // Counter test
@@ -38,8 +58,13 @@ class test_factory;
             "underflow_interrupt_test":       test = underflow_interrupt_test::new();
             "polling_mode_test":              test = polling_mode_test::new();
             "interrupt_clear_test":           test = interrupt_clear_test::new();
+            "interrupt_clear_no_divide_test": test = interrupt_clear_no_divide_test::new();
+            "interrupt_clear_by2_test":       test = interrupt_clear_by2_test::new();
+            "interrupt_clear_by4_test":       test = interrupt_clear_by4_test::new();
+            "interrupt_clear_by8_test":       test = interrupt_clear_by8_test::new();
             "interrupt_late_enable_test":     test = interrupt_late_enable_test::new();
             "interrupt_both_source_test":     test = interrupt_both_source_test::new();
+            "interrupt_mask_source_cross_test": test = interrupt_mask_source_cross_test::new();
             "status_set_clear_race_test":     test = status_set_clear_race_test::new();
             "interrupt_clkdiv_test":          test = interrupt_clkdiv_test::new();
 

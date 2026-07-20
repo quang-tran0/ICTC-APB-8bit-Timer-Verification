@@ -23,7 +23,7 @@ class environment;
 
         stim = new(s2d_mb);
         drv  = new(vif, s2d_mb, xfer_done);
-        sb   = new(m2s_mb, ker_clk_edge);
+        sb   = new(vif, m2s_mb, ker_clk_edge);
         mon  = new(vif, m2s_mb, ker_clk_edge);
     endfunction
 

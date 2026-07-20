@@ -1,4 +1,5 @@
 class scoreboard;
+    virtual dut_if vif;
     mailbox #(obs_packet) m2s_mb;
     event ker_clk_edge;
 
@@ -26,10 +27,117 @@ class scoreboard;
     int unsigned protocol_error_count;
 
     logic prev_penable;
+    bit [7:0] prev_dut_counter;
+    bit       prev_interrupt;
 
-    function new(mailbox #(obs_packet) m2s_mb, event ker_clk_edge);
+    covergroup cg_reg_access with function sample(bit [7:0] addr,
+                                                   bit       write_access);
+        option.per_instance = 1;
+        cp_addr: coverpoint addr {
+            bins tcr      = {8'h00};
+            bins tsr      = {8'h01};
+            bins tdr      = {8'h02};
+            bins tie      = {8'h03};
+            bins reserved = {[8'h04:8'hFF]};
+        }
+        cp_dir: coverpoint write_access {
+            bins reads  = {1'b0};
+            bins writes = {1'b1};
+        }
+        cx_addr_dir: cross cp_addr, cp_dir {
+            ignore_bins reserved_write =
+                binsof(cp_addr.reserved) && binsof(cp_dir.writes);
+        }
+    endgroup
+
+    covergroup cg_config with function sample(bit [1:0] clkdiv,
+                                               bit       count_down,
+                                               bit       load,
+                                               bit       previous_timer_en,
+                                               bit       timer_en);
+        option.per_instance = 1;
+        cp_clk_div: coverpoint clkdiv {
+            bins no_divide = {2'b00};
+            bins div_2     = {2'b01};
+            bins div_4     = {2'b10};
+            bins div_8     = {2'b11};
+        }
+        cp_count_down: coverpoint count_down {
+            bins up   = {1'b0};
+            bins down = {1'b1};
+        }
+        cp_load: coverpoint load {
+            bins clear = {1'b0};
+            bins set   = {1'b1};
+        }
+        cp_timer_en: coverpoint {previous_timer_en, timer_en} {
+            bins start = {2'b01};
+            bins stop  = {2'b10};
+        }
+        cx_clkdiv_direction: cross cp_clk_div, cp_count_down
+            iff (!previous_timer_en && timer_en);
+    endgroup
+
+    covergroup cg_counter with function sample(bit [7:0] previous_count,
+                                                bit [7:0] count,
+                                                bit [7:0] tdr,
+                                                bit       load,
+                                                bit       counting);
+        option.per_instance = 1;
+        cp_cnt_value: coverpoint count {
+            bins zero = {8'h00};
+            bins one  = {8'h01};
+            bins low  = {[8'h02:8'h7E]};
+            bins mid  = {8'h7F};
+            bins high = {[8'h80:8'hFE]};
+            bins max  = {8'hFF};
+        }
+        cp_cnt_transition: coverpoint {previous_count, count} iff (counting) {
+            bins overflow  = {16'hFF00};
+            bins underflow = {16'h00FF};
+        }
+        cp_tdr_load_value: coverpoint tdr iff (load) {
+            bins zero   = {8'h00};
+            bins max    = {8'hFF};
+            bins others = {[8'h01:8'hFE]};
+        }
+    endgroup
+
+    covergroup cg_interrupt with function sample(bit [1:0] tie,
+                                                  bit       tie_sample,
+                                                  bit       status_source,
+                                                  bit       status_set,
+                                                  bit       previous_irq,
+                                                  bit       irq,
+                                                  bit       irq_sample);
+        option.per_instance = 1;
+        cp_tie: coverpoint tie iff (tie_sample) {
+            bins disabled = {2'b00};
+            bins ovf_only = {2'b01};
+            bins udf_only = {2'b10};
+            bins both     = {2'b11};
+        }
+        cp_status_src: coverpoint status_source iff (status_set) {
+            bins overflow  = {1'b0};
+            bins underflow = {1'b1};
+        }
+        cx_tie_status: cross cp_tie, cp_status_src iff (status_set);
+        cp_int_out: coverpoint {previous_irq, irq} iff (irq_sample) {
+            bins asserted = {2'b01};
+            bins cleared  = {2'b10};
+        }
+    endgroup
+
+    function new(virtual dut_if vif,
+                 mailbox #(obs_packet) m2s_mb,
+                 event ker_clk_edge);
+        this.vif          = vif;
         this.m2s_mb       = m2s_mb;
         this.ker_clk_edge = ker_clk_edge;
+        cg_reg_access = new();
+        cg_config     = new();
+        cg_counter    = new();
+        cg_interrupt  = new();
         reset_ref();
         compare_count        = 0;
         mismatch_count       = 0;
@@ -39,6 +147,8 @@ class scoreboard;
         irq_mismatch_count   = 0;
         protocol_error_count = 0;
         prev_penable         = 1'b0;
+        prev_dut_counter     = 8'h00;
+        prev_interrupt       = 1'b0;
     endfunction
 
     function void reset_ref();
@@ -58,6 +168,8 @@ class scoreboard;
     // Sync the reference model to a hardware reset (presetn asserted).
     function void hard_reset();
         reset_ref();
+        prev_dut_counter = 8'h00;
+        prev_interrupt   = 1'b0;
         $display("%0t: [scoreboard] hard_reset -> defaults", $time);
     endfunction
 
@@ -212,6 +324,7 @@ class scoreboard;
             forever begin
                 m2s_mb.get(obs);
                 if (obs.psel === 1'b1 && obs.penable === 1'b1 && prev_penable === 1'b0) begin
+                    cg_reg_access.sample(obs.paddr, obs.pwrite);
                     compare_count++;
                     if (obs.pready !== 1'b1) begin
                         $error("%0t: [scoreboard] PROTOCOL: pready not 1 in ACCESS", $time);
@@ -223,14 +336,54 @@ class scoreboard;
                         compare_read(obs);
                 end
                 prev_penable = obs.penable;
+                if (!vif.presetn) begin
+                    prev_interrupt = 1'b0;
+                end else begin
+                    cg_interrupt.sample(ref_tie, 1'b0, 1'b0, 1'b0,
+                                        prev_interrupt, obs.interrupt, 1'b1);
+                    prev_interrupt = obs.interrupt;
+                end
                 #1;
+            end
+            forever begin
+                bit [7:0] current_count;
+                bit       counting;
+
+                @(posedge vif.clk_in);
+                #1;
+                current_count = vif.counter;
+                if (!vif.presetn) begin
+                    prev_dut_counter = current_count;
+                end else begin
+                    counting = ref_timer_en && !ref_load_bit;
+                    cg_counter.sample(prev_dut_counter, current_count,
+                                      ref_tdr, ref_load_bit, counting);
+
+                    if (counting && prev_dut_counter == 8'hFF && current_count == 8'h00)
+                        cg_interrupt.sample(ref_tie, 1'b1, 1'b0, 1'b1,
+                                            prev_interrupt, vif.interrupt, 1'b0);
+                    if (counting && prev_dut_counter == 8'h00 && current_count == 8'hFF)
+                        cg_interrupt.sample(ref_tie, 1'b1, 1'b1, 1'b1,
+                                            prev_interrupt, vif.interrupt, 1'b0);
+
+                    prev_dut_counter = current_count;
+                end
             end
         join_none
     endtask
 
     task compare_write(obs_packet obs);
+        bit previous_timer_en;
+
         write_count++;
+        previous_timer_en = ref_timer_en;
         ref_write(obs.paddr, obs.pwdata);
+        if (obs.paddr == 8'h00)
+            cg_config.sample(ref_clkdiv, ref_count_down, ref_load_bit,
+                             previous_timer_en, ref_timer_en);
+        if (obs.paddr == 8'h03)
+            cg_interrupt.sample(ref_tie, 1'b1, 1'b0, 1'b0,
+                                prev_interrupt, obs.interrupt, 1'b0);
         $display("%0t: [scoreboard] WRITE paddr=8'h%02h pwdata=8'h%02h | TCR=8'h%02h TSR=8'h%02h TDR=8'h%02h TIE=8'h%02h",
                  $time, obs.paddr, obs.pwdata,
                  {3'b000, ref_tcr}, {6'b000000, ref_tsr}, ref_tdr, {6'b000000, ref_tie});
@@ -264,6 +417,10 @@ class scoreboard;
         $display("  interrupt checks     = %0d", irq_check_count);
         $display("  interrupt mismatches = %0d", irq_mismatch_count);
         $display("  protocol errors      = %0d", protocol_error_count);
+        $display("  cg_reg_access        = %0.2f%%", cg_reg_access.get_inst_coverage());
+        $display("  cg_config            = %0.2f%%", cg_config.get_inst_coverage());
+        $display("  cg_counter           = %0.2f%%", cg_counter.get_inst_coverage());
+        $display("  cg_interrupt         = %0.2f%%", cg_interrupt.get_inst_coverage());
         $display("  STATUS               = %s", (total_fail == 0) ? "PASS" : "FAIL");
         $display("================================================");
     endfunction

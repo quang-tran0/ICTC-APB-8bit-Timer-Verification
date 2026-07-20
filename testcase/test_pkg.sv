@@ -13,10 +13,7 @@ package test_pkg;
     `include "random_register_test.sv"
 
     // Clock divisor test
-    `include "clkdiv_no_divide_test.sv"
-    `include "clkdiv_by2_test.sv"
-    `include "clkdiv_by4_test.sv"
-    `include "clkdiv_by8_test.sv"
+    `include "clkdiv_matrix_test.sv"
     `include "clkdiv_reconfig_test.sv"
 
     // Counter test
@@ -37,8 +34,10 @@ package test_pkg;
     `include "underflow_interrupt_test.sv"
     `include "polling_mode_test.sv"
     `include "interrupt_clear_test.sv"
+    `include "interrupt_clear_clkdiv_modes_test.sv"
     `include "interrupt_late_enable_test.sv"
     `include "interrupt_both_source_test.sv"
+    `include "interrupt_mask_source_cross_test.sv"
     `include "status_set_clear_race_test.sv"
     `include "interrupt_clkdiv_test.sv"
 

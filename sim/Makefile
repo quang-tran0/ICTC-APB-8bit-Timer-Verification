@@ -56,7 +56,8 @@ wave:
 cov_gui:
 	$(VSIM) -i -viewcov ${TESTNAME}.ucdb &
 cov_merge:
-	$(VCOVER) merge IP_MERGE.ucdb *.ucdb
+	$(VCOVER) merge IP_MERGE.ucdb $(filter-out IP_MERGE.ucdb,$(wildcard *.ucdb))
+	$(VCOVER) report -details -cvg -output coverage.rpt IP_MERGE.ucdb
 clean:
 	rm -rf work
 	rm -rf vsim.dbg

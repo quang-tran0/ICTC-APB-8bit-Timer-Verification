@@ -18,9 +18,6 @@ module timer_counter(
 			s_ovf <= 1'b0;
 			s_udf <= 1'b0;
 		end else begin
-			s_ovf <= 1'b0;
-			s_udf <= 1'b0;
-
 			// The specification requires load to take priority over counting:
 			// while load is asserted, hold the counter at the TDR value.
 			if (load) begin
@@ -29,14 +26,15 @@ module timer_counter(
 				if (count_down) begin
 					if (counter == 8'h00) begin
 						counter <= 8'hFF;
-						s_udf <= 1'b1;
+						// Toggle events cannot be missed by the slower pclk domain.
+						s_udf <= ~s_udf;
 					end else begin
 						counter <= counter - 8'd1;
 					end
 				end else begin
 					if (counter == 8'hFF) begin
 						counter <= 8'h00;
-						s_ovf <= 1'b1;
+						s_ovf <= ~s_ovf;
 					end else begin
 						counter <= counter + 8'd1;
 					end

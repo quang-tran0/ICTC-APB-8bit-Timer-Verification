@@ -19,11 +19,15 @@ module testbench;
         .pready(d_if.pready),
         .interrupt(d_if.interrupt));
 
+    assign d_if.clk_in  = u_dut.clk_out;
+    assign d_if.counter = u_dut.u_counter.counter;
+
     initial begin
         d_if.pwdata  = 0;
         d_if.psel    = 0;
         d_if.penable = 0;
         d_if.pwrite  = 0;
+        d_if.allow_invalid_apb = 0;
         d_if.presetn = 0;
         #100ns d_if.presetn = 1;
     end

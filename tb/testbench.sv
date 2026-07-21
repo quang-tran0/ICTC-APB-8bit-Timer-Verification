@@ -19,9 +19,6 @@ module testbench;
         .pready(d_if.pready),
         .interrupt(d_if.interrupt));
 
-    assign d_if.clk_in  = u_dut.clk_out;
-    assign d_if.counter = u_dut.u_counter.counter;
-
     initial begin
         d_if.pwdata  = 0;
         d_if.psel    = 0;

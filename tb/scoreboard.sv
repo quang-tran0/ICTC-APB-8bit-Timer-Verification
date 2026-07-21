@@ -27,7 +27,6 @@ class scoreboard;
     int unsigned protocol_error_count;
 
     logic prev_penable;
-    bit [7:0] prev_dut_counter;
     bit       prev_interrupt;
 
     covergroup cg_reg_access with function sample(bit [7:0] addr,
@@ -147,7 +146,6 @@ class scoreboard;
         irq_mismatch_count   = 0;
         protocol_error_count = 0;
         prev_penable         = 1'b0;
-        prev_dut_counter     = 8'h00;
         prev_interrupt       = 1'b0;
     endfunction
 
@@ -168,8 +166,7 @@ class scoreboard;
     // Sync the reference model to a hardware reset (presetn asserted).
     function void hard_reset();
         reset_ref();
-        prev_dut_counter = 8'h00;
-        prev_interrupt   = 1'b0;
+        prev_interrupt = 1'b0;
         $display("%0t: [scoreboard] hard_reset -> defaults", $time);
     endfunction
 
@@ -235,13 +232,28 @@ class scoreboard;
     // On a clk_in rising edge: while load is set the counter holds the TDR
     // value (stops counting), otherwise it counts when enabled.
     function void posedge_kerclk();
+        bit [7:0] previous_count;
+
+        if (!vif.presetn) return;
         if (!clk_in_rising()) return;
 
+        previous_count = ref_counter;
         if (ref_load_bit) begin
             ref_counter = ref_tdr;
         end else if (ref_timer_en) begin
             tick_count_mode();
         end
+
+        cg_counter.sample(previous_count, ref_counter, ref_tdr,
+                          ref_load_bit, ref_timer_en && !ref_load_bit);
+        if (ref_timer_en && !ref_load_bit &&
+            previous_count == 8'hFF && ref_counter == 8'h00)
+            cg_interrupt.sample(ref_tie, 1'b1, 1'b0, 1'b1,
+                                prev_interrupt, vif.interrupt, 1'b0);
+        if (ref_timer_en && !ref_load_bit &&
+            previous_count == 8'h00 && ref_counter == 8'hFF)
+            cg_interrupt.sample(ref_tie, 1'b1, 1'b1, 1'b1,
+                                prev_interrupt, vif.interrupt, 1'b0);
     endfunction
 
     function void tcr_config_timer(bit [4:3] clkdiv, bit load, bit count_down, bit timer_en);
@@ -289,10 +301,6 @@ class scoreboard;
     // ---- Public API for tests ------------------------------------------
     function bit [7:0] get_ref(bit [7:0] addr);
         return ref_read(addr);
-    endfunction
-
-    function bit [7:0] get_counter();
-        return ref_counter;
     endfunction
 
     function bit expected_interrupt();
@@ -344,30 +352,6 @@ class scoreboard;
                     prev_interrupt = obs.interrupt;
                 end
                 #1;
-            end
-            forever begin
-                bit [7:0] current_count;
-                bit       counting;
-
-                @(posedge vif.clk_in);
-                #1;
-                current_count = vif.counter;
-                if (!vif.presetn) begin
-                    prev_dut_counter = current_count;
-                end else begin
-                    counting = ref_timer_en && !ref_load_bit;
-                    cg_counter.sample(prev_dut_counter, current_count,
-                                      ref_tdr, ref_load_bit, counting);
-
-                    if (counting && prev_dut_counter == 8'hFF && current_count == 8'h00)
-                        cg_interrupt.sample(ref_tie, 1'b1, 1'b0, 1'b1,
-                                            prev_interrupt, vif.interrupt, 1'b0);
-                    if (counting && prev_dut_counter == 8'h00 && current_count == 8'hFF)
-                        cg_interrupt.sample(ref_tie, 1'b1, 1'b1, 1'b1,
-                                            prev_interrupt, vif.interrupt, 1'b0);
-
-                    prev_dut_counter = current_count;
-                end
             end
         join_none
     endtask

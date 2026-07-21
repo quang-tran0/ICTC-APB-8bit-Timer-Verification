@@ -10,8 +10,6 @@ interface dut_if;
     logic [7:0]    prdata;     // APB Read data
     logic          pready;     // APB Read data
     logic          interrupt;  // Interrupt signal
-    logic          clk_in;     // Internal divided clock (verification tap)
-    logic [7:0]    counter;    // Internal counter value (verification tap)
     logic          allow_invalid_apb;
 
     wire access = psel && penable;

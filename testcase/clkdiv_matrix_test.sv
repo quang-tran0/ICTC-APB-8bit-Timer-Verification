@@ -26,11 +26,10 @@ class clkdiv_matrix_base_test extends base_test;
         bit [1:0] clkdiv;
         bit       count_down;
         bit [7:0] start_value;
-        bit [7:0] expected;
         bit [7:0] status_mask;
         int unsigned ticks;
-        int unsigned i;
-        time ker_t0, ker_period, clk_t0, clk_period;
+        int unsigned divider;
+        int unsigned no_irq_cycles;
 
         wait(vif.presetn == 1'b1);
         clkdiv      = get_clkdiv();
@@ -39,40 +38,38 @@ class clkdiv_matrix_base_test extends base_test;
         status_mask = count_down ? 8'h02 : 8'h01;
         ticks       = count_down ? (int'(start_value) + 1)
                                  : (256 - int'(start_value));
+        divider     = 1 << clkdiv;
 
         write(8'h01, 8'h03);
+        write(8'h03, status_mask);
         write(8'h02, start_value);
         write(8'h00, {3'b000, clkdiv, 1'b1, count_down, 1'b0});
 
-        // Measure clk_in while load holds the counter, then check the divisor.
-        @(posedge vif.ker_clk); ker_t0 = $time;
-        @(posedge vif.ker_clk); ker_period = $time - ker_t0;
-        @(posedge vif.clk_in);  clk_t0 = $time;
-        @(posedge vif.clk_in);  clk_period = $time - clk_t0;
-        if (clk_period != ker_period * (1 << clkdiv))
-            $error("%0t: [%s] clock period mismatch got=%0t expected=%0t",
-                   $time, get_name(), clk_period,
-                   ker_period * (1 << clkdiv));
-        #1;
-        if (vif.counter !== start_value)
-            $error("%0t: [%s] load mismatch got=%02h expected=%02h",
-                   $time, get_name(), vif.counter, start_value);
+        // Allow at least one divided-clock edge to load TDR. The counter and
+        // divided clock are DUT-internal, so verify them through public status
+        // and interrupt behavior instead of hierarchical verification taps.
+        wait_ker(2 * divider);
+        if (vif.interrupt !== 1'b0)
+            $error("%0t: [%s] interrupt asserted while load is held",
+                   $time, get_name());
+        read(8'h01);
 
         write(8'h00, {3'b000, clkdiv, 1'b0, count_down, 1'b1});
-        expected = start_value;
-        for (i = 0; i < ticks; i++) begin
-            @(posedge vif.clk_in);
-            #1;
-            expected = count_down ? expected - 8'd1 : expected + 8'd1;
-            if (vif.counter !== expected)
-                $error("%0t: [%s] counter mismatch tick=%0d got=%02h expected=%02h",
-                       $time, get_name(), i + 1, vif.counter, expected);
-        end
+        no_irq_cycles = (ticks > 1) ? (ticks - 1) * divider : 0;
+        wait_ker(no_irq_cycles);
+        if (vif.interrupt !== 1'b0)
+            $error("%0t: [%s] interrupt asserted before expected rollover",
+                   $time, get_name());
+
+        wait_interrupt_high(8);
+        if (vif.interrupt !== 1'b1)
+            $error("%0t: [%s] interrupt missing at expected rollover",
+                   $time, get_name());
 
         write(8'h00, {3'b000, clkdiv, 1'b0, count_down, 1'b0});
-        wait_pclk(3);
         read(8'h01);
         write(8'h01, status_mask);
+        write(8'h03, 8'h00);
     endtask
 endclass
 

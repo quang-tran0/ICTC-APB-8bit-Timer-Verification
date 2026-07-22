@@ -15,8 +15,8 @@ class packet;
     bit pready;
 
     // CPU/ker domain clock-edge counters (used by reference model ordering)
-    int unsigned  ker_edges;
-    int unsigned  p_edges;
+    // int unsigned  ker_edges;
+    // int unsigned  p_edges;
 
     function new();
     endfunction

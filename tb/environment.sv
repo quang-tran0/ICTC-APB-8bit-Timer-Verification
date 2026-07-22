@@ -19,8 +19,8 @@ class environment;
         s2d_mb = new();
 
         stim = new(s2d_mb);
-        drv = new(vif, m2s_mb);
-        mon = new(vif, s2d_mb);
+        drv = new(vif, s2d_mb);
+        mon = new(vif, m2s_mb);
         sb = new(m2s_mb);
     endfunction
 

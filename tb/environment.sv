@@ -28,10 +28,10 @@ class environment;
     task run();
         $display("%0t: [environment] Running environment", $time);
         fork
-            stim.start();
-            drv.start();
-            mon.start();
-            sb.start();
+            stim.run();
+            drv.run();
+            mon.run();
+            sb.run();
         join_none
     endtask
 endclass

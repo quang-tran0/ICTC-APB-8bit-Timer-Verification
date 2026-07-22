@@ -1,6 +1,8 @@
 log/
 build/
 *.log
+modelsim.ini
+sim/work/
 
 # OS generated files
 .DS_Store

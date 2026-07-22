@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1ns/1ns
 
 module testbench;
     import timer_pkg::*;
@@ -20,18 +20,41 @@ module testbench;
         .interrupt(d_if.interrupt));
 
     initial begin
-        d_if.pclk = 1'b0;
-        d_if.ker_clk = 1'b0;
-        d_if.presetn = 1'b0;
-        d_if.psel = 1'b0;
-        d_if.penable = 1'b0;
-        d_if.pwrite = 1'b0;
-        d_if.paddr = 8'h00;
-        d_if.pwdata = 8'h00;
+        d_if.pwdata  = 0;
+        d_if.psel    = 0;
+        d_if.penable = 0;
+        d_if.pwrite  = 0;
+        d_if.presetn = 0;
+        #100ns d_if.presetn = 1;
+    end
 
-        $display("hello world");
-        #10ns;
+    // Clock generation 50MHz for pclk and 200MHz for ker_clk
+    initial begin
+        d_if.pclk = 1;
+        d_if.ker_clk = 1;
+
+        forever #10ns d_if.pclk = ~d_if.pclk;
+        forever #2.5ns d_if.ker_clk = ~d_if.ker_clk;
+    end
+
+    initial begin
+        #100us;
+        $display("%0t: [testbench] Simulation timeout", $time);
         $finish;
+    end
+
+    initial begin
+        environment env;
+        packet pkt;
+        env = new(d_if);
+        pkt = new();
+        pkt.addr = 8'h00;
+        pkt.data = 8'hAA;
+        pkt.transfer = packet::WRITE;
+
+        env.build();
+        env.stim.send_pkt(pkt);
+        env.run();
     end
 
 endmodule

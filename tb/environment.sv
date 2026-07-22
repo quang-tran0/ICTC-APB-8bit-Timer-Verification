@@ -1,6 +1,7 @@
 class environment;
     mailbox #(packet) m2s_mb;
     mailbox #(packet) s2d_mb;
+    event xfer_done;
 
     virtual dut_if vif;
 
@@ -19,8 +20,8 @@ class environment;
         s2d_mb = new();
 
         stim = new(s2d_mb);
-        drv = new(vif, s2d_mb);
-        mon = new(vif, m2s_mb);
+        drv = new(vif, s2d_mb, xfer_done);
+        mon = new(vif, m2s_mb, xfer_done);
         sb = new(m2s_mb);
     endfunction
 

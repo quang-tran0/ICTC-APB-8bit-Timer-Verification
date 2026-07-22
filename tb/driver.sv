@@ -2,9 +2,15 @@ class driver;
     mailbox #(packet) s2d_mb;        // nhận packet từ stimulus
     virtual dut_if dut_vif;
 
-    function new(virtual dut_if dut_vif, mailbox #(packet) s2d_mb);
+    event xfer_done;
+    int unsigned completed;
+
+    function new(virtual dut_if dut_vif, mailbox #(packet) s2d_mb, event xfer_done);
         this.dut_vif = dut_vif;
         this.s2d_mb = s2d_mb;
+        this.xfer_done = xfer_done;
+
+        this.completed = 0;
     endfunction
 
     task run();
@@ -29,9 +35,11 @@ class driver;
             while (dut_vif.pready !== 1'b1)
                 @(posedge dut_vif.pclk);
 
-            $display("%0t: [driver] Transaction done (pready=%b prdata=%02h)", $time, dut_vif.pready, dut_vif.prdata);
+            $display("%0t: [driver] Xfer done (pready=%b prdata=%02h)", $time, dut_vif.pready, dut_vif.prdata);
 
             idle();
+            completed++;
+            -> xfer_done;
         end
     endtask
 

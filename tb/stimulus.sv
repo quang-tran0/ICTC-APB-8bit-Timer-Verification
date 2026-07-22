@@ -19,8 +19,7 @@ class stimulus;
             wait(pkt_q.size() > 0);
             pkt = pkt_q.pop_front();
             s2d_mb.put(pkt);
-            $display("%0t: [stimulus] Sent packet to driver (in_flight=%0d)",
-                     $time, in_flight);
+            $display("%0t: [stimulus] Sent packet to driver (in_flight=%0d)", $time, in_flight);
         end
     endtask
 

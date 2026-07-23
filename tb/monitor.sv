@@ -13,7 +13,8 @@ class monitor;
         packet obs_pkt;
         forever begin
             @(xfer_done);
-            $display("%0t: [monitor] Observing transaction (paddr=%02h prdata=%02h pwdata=%02h pwrite=%b psel=%b penable=%b pready=%b)", $time, vif.paddr, vif.prdata, vif.pwdata, vif.pwrite, vif.psel, vif.penable, vif.pready);
+            #1;
+            $display("%0t: [monitor] Observing transaction (paddr=8h'%02h prdata=8h'%02h pwdata=8h'%02h pwrite=%b psel=%b penable=%b pready=%b)", $time, vif.paddr, vif.prdata, vif.pwdata, vif.pwrite, vif.psel, vif.penable, vif.pready);
             obs_pkt = new();
             obs_pkt.obs_paddr  = vif.paddr;
             obs_pkt.obs_prdata = vif.prdata;

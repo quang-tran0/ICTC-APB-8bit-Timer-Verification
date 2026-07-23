@@ -30,31 +30,36 @@ module testbench;
 
     // Clock generation 50MHz for pclk and 200MHz for ker_clk
     initial begin
-        d_if.pclk = 1;
-        d_if.ker_clk = 1;
+        d_if.pclk = 0;
+        d_if.ker_clk = 0;
 
         forever #10ns d_if.pclk = ~d_if.pclk;
         forever #2.5ns d_if.ker_clk = ~d_if.ker_clk;
     end
 
+    string test_name;
+    base_test test;
     initial begin
-        #100us;
-        $display("%0t: [testbench] Simulation timeout", $time);
-        $finish;
+        if (!$value$plusargs("test=%s", test_name)) begin
+            test_name = "default_value_register_test";
+        end
+
+        $display("%0t: [testbench] Running test: %s", $time, test_name);
+
+        test = test_factory::create_test(test_name, d_if);
+        if (test == null) begin
+            $display("[testbench] no test selected, finishing");
+            $finish;
+        end
+        
+        test.vif = d_if;
+        test.run_test();
     end
 
-    initial begin
-        environment env;
-        packet pkt;
-        env = new(d_if);
-        pkt = new();
-        pkt.addr = 8'h00;
-        pkt.data = 8'hAA;
-        pkt.transfer = packet::WRITE;
-
-        env.build();
-        env.stim.send_pkt(pkt);
-        env.run();
-    end
-
+    // initial begin
+    //     #100us;
+    //     $display("%0t: [testbench] Simulation timeout", $time);
+    //     test.report();
+    //     $finish;
+    // end
 endmodule

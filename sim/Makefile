@@ -4,7 +4,7 @@
 ##################################################################################################
 
 #Define variables
-TESTNAME 	?= default_test
+TESTNAME 	?= default_value_register_test
 TB_NAME 	?= testbench
 RADIX			?= hexadecimal
 SEED      ?= 1

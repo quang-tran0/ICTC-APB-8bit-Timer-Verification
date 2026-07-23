@@ -20,7 +20,7 @@ class driver;
             @(posedge dut_vif.pclk);
 
             // prepare transaction
-            $display("%0t: [driver] Driving transaction (addr=%02h data=%02h transfer=%s)", $time, pkt.addr, pkt.data, (pkt.transfer==packet::READ)?"READ":"WRITE");
+            $display("%0t: [driver] Driving transaction (addr=8'h%02h data=8'h%02h transfer=%s)", $time, pkt.addr, pkt.data, (pkt.transfer==packet::READ)?"READ":"WRITE");
             dut_vif.paddr = pkt.addr;
             dut_vif.pwrite = pkt.transfer;
             dut_vif.psel = 1'b1;
@@ -35,7 +35,7 @@ class driver;
             while (dut_vif.pready !== 1'b1)
                 @(posedge dut_vif.pclk);
 
-            $display("%0t: [driver] Xfer done (pready=%b prdata=%02h)", $time, dut_vif.pready, dut_vif.prdata);
+            $display("%0t: [driver] Xfer done (pready=%b prdata=8'h%02h)", $time, dut_vif.pready, dut_vif.prdata);
 
             idle();
             completed++;

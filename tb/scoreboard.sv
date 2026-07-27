@@ -1,9 +1,5 @@
-// scoreboard.sv
-// Self-checking scoreboard: dự đoán giá trị từng APB transaction dựa trên
-// reference model (TCR/TSR/TDR/TIE) rồi so sánh với packet nhận từ monitor.
-
 class scoreboard;
-    mailbox #(packet) m2s_mb;
+    mailbox #(obs_packet) m2s_mb;
 
     // Reference model — chỉ phản ánh DUT, cập nhật theo đặc tả
     bit [4:0] ref_tcr;        // TCR (5-bit)
@@ -17,13 +13,17 @@ class scoreboard;
     int unsigned write_count;
     int unsigned read_count;
 
-    function new(mailbox #(packet) m2s_mb);
+    // State của cycle trước — để xác định rising edge của penable
+    logic prev_penable;
+
+    function new(mailbox #(obs_packet) m2s_mb);
         this.m2s_mb = m2s_mb;
         reset_ref();
         compare_count  = 0;
         mismatch_count = 0;
         write_count    = 0;
         read_count     = 0;
+        prev_penable   = 1'b0;
     endfunction
 
     function void reset_ref();
@@ -36,10 +36,7 @@ class scoreboard;
     // --------- Reference: apply WRITE ----------
     function void ref_write(bit [7:0] addr, bit [7:0] data);
         case (addr)
-            8'h00: begin
-                // TCR full-write: cả 5 bit [4:0] đều được ghi, kể cả khi timer_en=1.
-                ref_tcr = data[4:0];
-            end
+            8'h00: ref_tcr = data[4:0];
             8'h01: ref_tsr = ref_tsr & ~data[1:0];   // W1C
             8'h02: ref_tdr = data;
             8'h03: ref_tie = data[1:0];
@@ -62,44 +59,49 @@ class scoreboard;
 
     // --------- Main loop ----------
     task run();
-        packet pkt;
+        obs_packet obs;
         forever begin
-            m2s_mb.get(pkt);
+            m2s_mb.get(obs);
             compare_count++;
 
-            if (pkt.transfer == packet::WRITE)
-                compare_write(pkt);
-            else
-                compare_read(pkt);
+            if (obs.psel === 1'b1 && obs.penable === 1'b1 && prev_penable === 1'b0) begin
+                if (obs.pwrite === 1'b1)
+                    compare_write(obs);
+                else
+                    compare_read(obs);
+            end
 
+            prev_penable = obs.penable;
             #1;
         end
     endtask
 
-    task compare_write(packet pkt);
+    task compare_write(obs_packet obs);
+        bit [7:0] addr  = obs.paddr;
+        bit [7:0] data  = obs.pwdata;
         write_count++;
-        ref_write(pkt.addr, pkt.data);
+        ref_write(addr, data);
         $display("%0t: [scoreboard] WRITE paddr=8'h%02h pwdata=8'h%02h | TCR=8'h%02h TSR=8'h%02h TDR=8'h%02h TIE=8'h%02h",
-                 $time, pkt.addr, pkt.data,
+                 $time, addr, data,
                  {3'b000, ref_tcr}, {6'b000000, ref_tsr},
                  ref_tdr, {6'b000000, ref_tie});
     endtask
 
-    task compare_read(packet pkt);
+    task compare_read(obs_packet obs);
+        bit [7:0] addr = obs.paddr;
+        bit [7:0] got  = obs.prdata;
         bit [7:0] exp;
-        bit [7:0] got;
 
         read_count++;
-        exp = ref_read(pkt.addr);
-        got = pkt.data;
+        exp = ref_read(addr);
 
         if (got !== exp) begin
             $error("%0t: [scoreboard] READ MISMATCH paddr=%02h got=%02h exp=%02h",
-                   $time, pkt.addr, got, exp);
+                   $time, addr, got, exp);
             mismatch_count++;
         end else begin
             $display("%0t: [scoreboard] READ OK paddr=%02h prdata=%02h",
-                     $time, pkt.addr, got);
+                     $time, addr, got);
         end
     endtask
 

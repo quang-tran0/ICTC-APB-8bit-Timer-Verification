@@ -1,5 +1,6 @@
 package timer_pkg;
     `include "packet.sv"
+    `include "obs_packet.sv"
     `include "stimulus.sv"
     `include "driver.sv"
     `include "monitor.sv"

@@ -1,5 +1,5 @@
 class environment;
-    mailbox #(packet) m2s_mb;
+    mailbox #(obs_packet) m2s_mb;
     mailbox #(packet) s2d_mb;
     event xfer_done;
 

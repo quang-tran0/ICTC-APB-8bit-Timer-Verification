@@ -6,7 +6,7 @@
 # default_value_register_test, rw_register_test
 
 #Define variables
-TESTNAME 	?= default_value_register_test
+TESTNAME 	?= rw_register_test
 TB_NAME 	?= testbench
 RADIX			?= hexadecimal
 SEED      ?= 1

@@ -14,6 +14,7 @@ class default_value_register_test extends base_test;
     endfunction
 
     virtual task run_scenario();
+        wait(vif.presetn == 1'b1);
         $display("%0t: [%s] start", $time, get_name());
 
         read(8'h00);

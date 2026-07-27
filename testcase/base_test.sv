@@ -20,18 +20,16 @@ class base_test;
         @(env.xfer_done);
     endtask
 
-    virtual task read(input bit[7:0] addr, output bit[7:0] data);
+    // READ chỉ cần addr; scoreboard tự so sánh giá trị trả về (prdata)
+    // với reference model — không cần lấy data về tại đây.
+    virtual task read(input bit[7:0] addr);
         packet pkt;
-        packet rsp;
         pkt = new();
         pkt.addr     = addr;
         pkt.data     = 8'h00;
         pkt.transfer = packet::READ;
         env.stim.send_pkt(pkt);
         @(env.xfer_done);
-        // // Drain exactly one rsp packet produced for this transaction.
-        // rsp_mb.get(rsp);
-        data = pkt.data;
     endtask
 
     task send_pkt(packet pkt);

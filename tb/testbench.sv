@@ -40,7 +40,7 @@ module testbench;
     string test_name;
     base_test test;
     initial begin
-        if (!$value$plusargs("test=%s", test_name)) begin
+        if (!$value$plusargs("TESTNAME=%s", test_name)) begin
             test_name = "default_value_register_test";
         end
 

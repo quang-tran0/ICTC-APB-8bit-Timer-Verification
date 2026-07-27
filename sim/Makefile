@@ -3,6 +3,8 @@
 #Updated date: 6/30/2024
 ##################################################################################################
 
+# default_value_register_test, rw_register_test
+
 #Define variables
 TESTNAME 	?= default_value_register_test
 TB_NAME 	?= testbench

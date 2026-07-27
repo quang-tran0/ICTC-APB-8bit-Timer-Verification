@@ -1,3 +1,7 @@
+// scoreboard.sv
+// Self-checking scoreboard: dự đoán giá trị từng APB transaction dựa trên
+// reference model (TCR/TSR/TDR/TIE) rồi so sánh với packet nhận từ monitor.
+
 class scoreboard;
     mailbox #(packet) m2s_mb;
 
@@ -13,9 +17,6 @@ class scoreboard;
     int unsigned write_count;
     int unsigned read_count;
 
-    // Cờ: nếu READ TSR kế tiếp có thể bị DUT đè bit do HW race
-    bit expect_tsr_race;
-
     function new(mailbox #(packet) m2s_mb);
         this.m2s_mb = m2s_mb;
         reset_ref();
@@ -23,7 +24,6 @@ class scoreboard;
         mismatch_count = 0;
         write_count    = 0;
         read_count     = 0;
-        expect_tsr_race = 1'b0;
     endfunction
 
     function void reset_ref();
@@ -33,15 +33,6 @@ class scoreboard;
         ref_tie = 2'b00;
     endfunction
 
-    function void hard_reset();
-        reset_ref();
-        compare_count  = 0;
-        mismatch_count = 0;
-        write_count    = 0;
-        read_count     = 0;
-        expect_tsr_race = 1'b0;
-    endfunction
-
     // --------- Reference: apply WRITE ----------
     function void ref_write(bit [7:0] addr, bit [7:0] data);
         case (addr)
@@ -49,6 +40,7 @@ class scoreboard;
                 if (ref_tcr[0] == 1'b0) begin
                     ref_tcr = data[4:0];
                 end else begin
+                    // TCR half-load reload: chỉ bit [0] (timer_en) được ghi khi đang chạy
                     ref_tcr = {ref_tcr[4:1], data[0]};
                 end
             end
@@ -72,43 +64,17 @@ class scoreboard;
         return rv;
     endfunction
 
-    // Test gọi khi biết counter vừa overflow/underflow
-    function void hw_set_tsr(bit overflow, bit underflow);
-        if (overflow)  ref_tsr[0] = 1'b1;
-        if (underflow) ref_tsr[1] = 1'b1;
-    endfunction
-
-    function void expect_next_tsr_race();
-        expect_tsr_race = 1'b1;
-    endfunction
-
-    // --------- Xác định loại transaction từ packet ----------
-    // Packet từ monitor không có trường `transfer` (chỉ có obs_*).
-    // Lấy transfer từ obs_pwrite (0 = READ, 1 = WRITE).
-    function packet::transfer_enum derive_transfer(packet pkt);
-        if (pkt.obs_pwrite == 1'b1)
-            return packet::WRITE;
-        else
-            return packet::READ;
-    endfunction
-
     // --------- Main loop ----------
     task run();
         packet pkt;
         forever begin
             m2s_mb.get(pkt);
-            if (pkt == null) begin
-                $error("%0t [scoreboard] null packet", $time);
-                continue;
-            end
-
             compare_count++;
 
-            if (derive_transfer(pkt) == packet::WRITE) begin
+            if (pkt.transfer == packet::WRITE)
                 compare_write(pkt);
-            end else begin
+            else
                 compare_read(pkt);
-            end
 
             #1;
         end
@@ -116,9 +82,9 @@ class scoreboard;
 
     task compare_write(packet pkt);
         write_count++;
-        ref_write(pkt.obs_paddr, pkt.obs_pwdata);
+        ref_write(pkt.addr, pkt.data);
         $display("%0t: [scoreboard] WRITE paddr=8'h%02h pwdata=8'h%02h | TCR=8'h%02h TSR=8'h%02h TDR=8'h%02h TIE=8'h%02h",
-                 $time, pkt.obs_paddr, pkt.obs_pwdata,
+                 $time, pkt.addr, pkt.data,
                  {3'b000, ref_tcr}, {6'b000000, ref_tsr},
                  ref_tdr, {6'b000000, ref_tie});
     endtask
@@ -126,32 +92,18 @@ class scoreboard;
     task compare_read(packet pkt);
         bit [7:0] exp;
         bit [7:0] got;
-        bit       do_compare;
 
         read_count++;
-        exp = ref_read(pkt.obs_paddr);
-        got = pkt.obs_prdata;
+        exp = ref_read(pkt.addr);
+        got = pkt.data;
 
-        if (pkt.obs_paddr == 8'h01 && expect_tsr_race) begin
-            // Đồng bộ model theo giá trị thực tế, không tính mismatch
-            ref_tsr = got[1:0];
-            expect_tsr_race = 1'b0;
-            $display("%0t: [scoreboard] READ TSR (race OK) got=%02h (sync ref_tsr)",
-                     $time, got);
-            do_compare = 1'b0;
+        if (got !== exp) begin
+            $error("%0t: [scoreboard] READ MISMATCH paddr=%02h got=%02h exp=%02h",
+                   $time, pkt.addr, got, exp);
+            mismatch_count++;
         end else begin
-            do_compare = 1'b1;
-        end
-
-        if (do_compare) begin
-            if (got !== exp) begin
-                $error("%0t: [scoreboard] READ MISMATCH paddr=%02h got=%02h exp=%02h",
-                       $time, pkt.obs_paddr, got, exp);
-                mismatch_count++;
-            end else begin
-                $display("%0t: [scoreboard] READ OK paddr=%02h prdata=%02h",
-                         $time, pkt.obs_paddr, got);
-            end
+            $display("%0t: [scoreboard] READ OK paddr=%02h prdata=%02h",
+                     $time, pkt.addr, got);
         end
     endtask
 
@@ -165,5 +117,4 @@ class scoreboard;
                  (mismatch_count == 0) ? "PASS" : "FAIL");
         $display("================================================");
     endfunction
-
 endclass

@@ -4,6 +4,7 @@ package test_pkg;
 
     // 1. Register test
     `include "default_value_register_test.sv"
+    `include "rw_register_test.sv"
 
     `include "test_factory.sv"
 endpackage

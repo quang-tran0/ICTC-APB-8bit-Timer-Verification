@@ -6,6 +6,7 @@ class test_factory;
 
             // 1. Register test
             "default_value_register_test": test = default_value_register_test::new();
+            "rw_register_test":            test = rw_register_test::new();
 
 
             default: begin

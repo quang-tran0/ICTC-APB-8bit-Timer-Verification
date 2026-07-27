@@ -37,12 +37,8 @@ class scoreboard;
     function void ref_write(bit [7:0] addr, bit [7:0] data);
         case (addr)
             8'h00: begin
-                if (ref_tcr[0] == 1'b0) begin
-                    ref_tcr = data[4:0];
-                end else begin
-                    // TCR half-load reload: chỉ bit [0] (timer_en) được ghi khi đang chạy
-                    ref_tcr = {ref_tcr[4:1], data[0]};
-                end
+                // TCR full-write: cả 5 bit [4:0] đều được ghi, kể cả khi timer_en=1.
+                ref_tcr = data[4:0];
             end
             8'h01: ref_tsr = ref_tsr & ~data[1:0];   // W1C
             8'h02: ref_tdr = data;

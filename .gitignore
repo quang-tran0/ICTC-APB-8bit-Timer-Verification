@@ -3,6 +3,12 @@ build/
 *.log
 modelsim.ini
 sim/work/
+sim/vsim.dbg
+sim/vsim.wlf
+sim/transcript
 
 # OS generated files
 .DS_Store
+
+# Temporary files
+~*

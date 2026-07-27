@@ -14,6 +14,7 @@ class rw_register_test extends base_test;
 
     virtual task run_scenario();
         int i;
+        wait(vif.presetn == 1'b1);
 
         $display("[%s] start", get_name());
 

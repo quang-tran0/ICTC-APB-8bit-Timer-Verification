@@ -46,11 +46,8 @@ module timer_register(
 		end else if (write_en) begin
 			unique case (paddr)
 				8'h00: begin
-					if (tcr[0] == 1'b0) begin
-						tcr <= pwdata[4:0];
-					end else begin
-						tcr <= {tcr[4:1], pwdata[0]};
-					end
+					// TCR full-write: cả 5 bit đều được ghi, kể cả khi timer_en=1.
+					tcr <= pwdata[4:0];
 				end
 				8'h02: reg_TDR <= pwdata;
 				8'h03: tie <= pwdata[1:0];

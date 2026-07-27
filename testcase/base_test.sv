@@ -20,8 +20,6 @@ class base_test;
         @(env.xfer_done);
     endtask
 
-    // READ chỉ cần addr; scoreboard tự so sánh giá trị trả về (prdata)
-    // với reference model — không cần lấy data về tại đây.
     virtual task read(input bit[7:0] addr);
         packet pkt;
         pkt = new();

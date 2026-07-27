@@ -3,10 +3,10 @@
 #Updated date: 6/30/2024
 ##################################################################################################
 
-# default_value_register_test, rw_register_test
+# default_value_register_test, rw_register_test, reserved_region_test
 
 #Define variables
-TESTNAME 	?= rw_register_test
+TESTNAME 	?= reserved_region_test
 TB_NAME 	?= testbench
 RADIX			?= hexadecimal
 SEED      ?= 1

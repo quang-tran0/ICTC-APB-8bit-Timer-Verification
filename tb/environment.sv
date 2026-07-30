@@ -3,6 +3,8 @@ class environment;
     mailbox #(packet) s2d_mb;
     event xfer_done;
 
+    event ker_clk_edge;
+
     virtual dut_if vif;
 
     stimulus stim;
@@ -20,9 +22,9 @@ class environment;
         s2d_mb = new();
 
         stim = new(s2d_mb);
-        drv = new(vif, s2d_mb, xfer_done);
-        mon = new(vif, m2s_mb);
-        sb = new(m2s_mb);
+        drv  = new(vif, s2d_mb, xfer_done);
+        sb   = new(m2s_mb, ker_clk_edge);
+        mon  = new(vif, m2s_mb, ker_clk_edge);
     endfunction
 
     task run();

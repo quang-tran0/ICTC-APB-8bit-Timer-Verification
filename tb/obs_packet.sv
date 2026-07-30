@@ -5,6 +5,6 @@ class obs_packet;
     logic [7:0]    paddr;      // APB Address
     logic [7:0]    pwdata;     // APB Write data
     logic [7:0]    prdata;     // APB Read data
-    logic          pready;     // APB Read data
+    logic          pready;     // APB Ready
     logic          interrupt;  // Interrupt signal
 endclass

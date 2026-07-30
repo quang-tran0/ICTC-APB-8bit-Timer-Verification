@@ -31,9 +31,10 @@ module testbench;
     // Clock generation 50MHz for pclk and 200MHz for ker_clk
     initial begin
         d_if.pclk = 0;
-        d_if.ker_clk = 0;
-
         forever #10ns d_if.pclk = ~d_if.pclk;
+    end
+    initial begin
+        d_if.ker_clk = 0;
         forever #2.5ns d_if.ker_clk = ~d_if.ker_clk;
     end
 

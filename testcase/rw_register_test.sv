@@ -1,11 +1,11 @@
-// Walk through every RW bit and random patterns across TCR/TDR/TIE.
+// Walk through every RW bit (walking-1/0) and random patterns on TCR/TDR/TIE.
 
 class rw_register_test extends base_test;
     function new();
         super.new();
     endfunction
 
-    function string get_name();
+    virtual function string get_name();
         return "rw_register_test";
     endfunction
 
@@ -14,7 +14,7 @@ class rw_register_test extends base_test;
         bit [7:0] pat;
 
         wait(vif.presetn == 1'b1);
-        $display("[%s] start", get_name());
+        $display("%0t: [%s] start", $time, get_name());
 
         // TCR [4:0] walking-1
         for (i = 0; i < 5; i++) begin
@@ -31,8 +31,9 @@ class rw_register_test extends base_test;
             write(8'h00, pat);
             read (8'h00);
         end
+        write(8'h00, 8'h00);
 
-        // TDR walking-1
+        // TDR [7:0] walking-1
         for (i = 0; i < 8; i++) begin
             pat = 8'h00;
             pat[i] = 1'b1;
@@ -40,16 +41,25 @@ class rw_register_test extends base_test;
             read (8'h02);
         end
 
-        // TIE [1:0]: 00, 01, 10, 11
+        // TDR [7:0] walking-0
+        for (i = 0; i < 8; i++) begin
+            pat = 8'hFF;
+            pat[i] = 1'b0;
+            write(8'h02, pat);
+            read (8'h02);
+        end
+
+        // TIE [1:0]
         for (i = 0; i < 4; i++) begin
             write(8'h03, {6'b0, 2'(i)});
             read (8'h03);
         end
 
-        // Random RW
+        // Random RW, keep timer_en = 0
         for (i = 0; i < 10; i++) begin
             pat = $urandom;
             pat[7:5] = 3'b0;
+            pat[0]   = 1'b0;
             write(8'h00, pat);
             read (8'h00);
 
@@ -60,6 +70,6 @@ class rw_register_test extends base_test;
             read (8'h03);
         end
 
-        $display("[%s] done", get_name());
+        $display("%0t: [%s] done", $time, get_name());
     endtask
 endclass

@@ -1,11 +1,11 @@
-// After reset, all registers should be 0.
+// After reset, all registers should read their default value (0).
 
 class default_value_register_test extends base_test;
     function new();
         super.new();
     endfunction
 
-    function string get_name();
+    virtual function string get_name();
         return "default_value_register_test";
     endfunction
 

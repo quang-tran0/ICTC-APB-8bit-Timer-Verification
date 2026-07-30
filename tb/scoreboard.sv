@@ -13,7 +13,6 @@ class scoreboard;
     bit       ref_load_bit;
     bit       ref_count_down;
     bit       ref_timer_en;
-    bit       ref_load_armed;
 
     bit [2:0] ref_div_cnt;
     bit       ref_clk_out_reg;
@@ -22,6 +21,9 @@ class scoreboard;
     int unsigned mismatch_count;
     int unsigned write_count;
     int unsigned read_count;
+    int unsigned irq_check_count;
+    int unsigned irq_mismatch_count;
+    int unsigned protocol_error_count;
 
     logic prev_penable;
 
@@ -29,11 +31,14 @@ class scoreboard;
         this.m2s_mb       = m2s_mb;
         this.ker_clk_edge = ker_clk_edge;
         reset_ref();
-        compare_count  = 0;
-        mismatch_count = 0;
-        write_count    = 0;
-        read_count     = 0;
-        prev_penable   = 1'b0;
+        compare_count        = 0;
+        mismatch_count       = 0;
+        write_count          = 0;
+        read_count           = 0;
+        irq_check_count      = 0;
+        irq_mismatch_count   = 0;
+        protocol_error_count = 0;
+        prev_penable         = 1'b0;
     endfunction
 
     function void reset_ref();
@@ -46,9 +51,14 @@ class scoreboard;
         ref_load_bit    = 1'b0;
         ref_count_down  = 1'b0;
         ref_timer_en    = 1'b0;
-        ref_load_armed  = 1'b0;
         ref_div_cnt     = 3'd0;
         ref_clk_out_reg = 1'b0;
+    endfunction
+
+    // Sync the reference model to a hardware reset (presetn asserted).
+    function void hard_reset();
+        reset_ref();
+        $display("%0t: [scoreboard] hard_reset -> defaults", $time);
     endfunction
 
     function void refresh_ref_tcr_fields();
@@ -76,46 +86,50 @@ class scoreboard;
         end
     endfunction
 
-    // Mirror timer_counter.v one-shot load then count, per ker_clk edge.
-    function void posedge_kerclk();
-        if (ref_load_bit) begin
-            if (!ref_load_armed) begin
-                ref_counter    = ref_tdr;
-                ref_load_armed = 1'b1;
-            end
-            return;
-        end else if (ref_load_armed) begin
-            ref_load_armed = 1'b0;
-        end
-
-        if (!ref_timer_en) return;
-
+    // Advance the clock divisor on every ker_clk (independent of timer_en,
+    // like the RTL divisor) and return 1 on a clk_in rising edge.
+    function bit clk_in_rising();
         case (ref_clkdiv)
-            2'b00: tick_count_mode();
+            2'b00: return 1'b1;
             2'b01: begin
                 ref_clk_out_reg = ~ref_clk_out_reg;
                 ref_div_cnt     = 3'd0;
-                if (ref_clk_out_reg) tick_count_mode();
+                return ref_clk_out_reg;
             end
             2'b10: begin
                 if (ref_div_cnt == 3'd1) begin
                     ref_clk_out_reg = ~ref_clk_out_reg;
                     ref_div_cnt     = 3'd0;
-                    if (ref_clk_out_reg) tick_count_mode();
+                    return ref_clk_out_reg;
                 end else begin
                     ref_div_cnt = ref_div_cnt + 3'd1;
+                    return 1'b0;
                 end
             end
             2'b11: begin
                 if (ref_div_cnt == 3'd3) begin
                     ref_clk_out_reg = ~ref_clk_out_reg;
                     ref_div_cnt     = 3'd0;
-                    if (ref_clk_out_reg) tick_count_mode();
+                    return ref_clk_out_reg;
                 end else begin
                     ref_div_cnt = ref_div_cnt + 3'd1;
+                    return 1'b0;
                 end
             end
         endcase
+        return 1'b0;
+    endfunction
+
+    // On a clk_in rising edge: while load is set the counter holds the TDR
+    // value (stops counting), otherwise it counts when enabled.
+    function void posedge_kerclk();
+        if (!clk_in_rising()) return;
+
+        if (ref_load_bit) begin
+            ref_counter = ref_tdr;
+        end else if (ref_timer_en) begin
+            tick_count_mode();
+        end
     endfunction
 
     function void tcr_config_timer(bit [4:3] clkdiv, bit load, bit count_down, bit timer_en);
@@ -160,6 +174,34 @@ class scoreboard;
         return rv;
     endfunction
 
+    // ---- Public API for tests ------------------------------------------
+    function bit [7:0] get_ref(bit [7:0] addr);
+        return ref_read(addr);
+    endfunction
+
+    function bit [7:0] get_counter();
+        return ref_counter;
+    endfunction
+
+    function bit expected_interrupt();
+        return (ref_tie[0] & ref_tsr[0]) | (ref_tie[1] & ref_tsr[1]);
+    endfunction
+
+    // Compare the observed interrupt output against the reference model.
+    function void check_interrupt(bit got);
+        bit exp;
+        exp = expected_interrupt();
+        irq_check_count++;
+        if (got !== exp) begin
+            $error("%0t: [scoreboard] IRQ MISMATCH got=%b exp=%b (tie=%b tsr=%b)",
+                   $time, got, exp, ref_tie, ref_tsr);
+            irq_mismatch_count++;
+        end else begin
+            $display("%0t: [scoreboard] IRQ OK irq=%b", $time, got);
+        end
+    endfunction
+    // --------------------------------------------------------------------
+
     task run();
         obs_packet obs;
         fork
@@ -171,6 +213,10 @@ class scoreboard;
                 m2s_mb.get(obs);
                 if (obs.psel === 1'b1 && obs.penable === 1'b1 && prev_penable === 1'b0) begin
                     compare_count++;
+                    if (obs.pready !== 1'b1) begin
+                        $error("%0t: [scoreboard] PROTOCOL: pready not 1 in ACCESS", $time);
+                        protocol_error_count++;
+                    end
                     if (obs.pwrite === 1'b1)
                         compare_write(obs);
                     else
@@ -204,12 +250,17 @@ class scoreboard;
     endtask
 
     function void report();
+        int unsigned total_fail;
+        total_fail = mismatch_count + irq_mismatch_count + protocol_error_count;
         $display("========== [scoreboard] FINAL REPORT ===========");
         $display("  compares             = %0d", compare_count);
         $display("  writes               = %0d", write_count);
         $display("  reads                = %0d", read_count);
         $display("  register mismatches  = %0d", mismatch_count);
-        $display("  STATUS               = %s", (mismatch_count == 0) ? "PASS" : "FAIL");
+        $display("  interrupt checks     = %0d", irq_check_count);
+        $display("  interrupt mismatches = %0d", irq_mismatch_count);
+        $display("  protocol errors      = %0d", protocol_error_count);
+        $display("  STATUS               = %s", (total_fail == 0) ? "PASS" : "FAIL");
         $display("================================================");
     endfunction
 endclass
